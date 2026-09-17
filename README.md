@@ -1,36 +1,47 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# あいてる？
 
-## Getting Started
+URLを送るだけで終わる日程調整アプリ。参加者は名前を入れて、空いている時間をなぞるだけ。登録・ログイン・アプリ不要。
 
-First, run the development server:
+設計メモは [docs/DESIGN.md](docs/DESIGN.md)。
+
+## 使い方（ローカル）
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+http://localhost:3000 を開く。`DATABASE_URL` が未設定のときは PGlite（ファイル内 PostgreSQL、`./.pglite`）が自動で使われるので、DBの準備は不要。
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 本番（Vercel + PostgreSQL）
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. Supabase / Neon / Vercel Postgres などで PostgreSQL を用意し、接続URLを `DATABASE_URL` に設定
+2. マイグレーションを適用
 
-## Learn More
+   ```bash
+   DATABASE_URL=postgres://... npm run db:migrate
+   ```
 
-To learn more about Next.js, take a look at the following resources:
+3. Vercel にデプロイ（環境変数 `DATABASE_URL` を設定）
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## スクリプト
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+| コマンド | 内容 |
+| --- | --- |
+| `npm run dev` | 開発サーバー |
+| `npm run build` / `npm start` | 本番ビルド / 起動 |
+| `npm run lint` | ESLint |
+| `npm run db:generate` | スキーマ変更から SQL マイグレーションを生成（`drizzle/`） |
+| `npm run db:migrate` | `DATABASE_URL` の DB にマイグレーションを適用 |
 
-## Deploy on Vercel
+## URL
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+| URL | 役割 |
+| --- | --- |
+| `/` | イベント作成 |
+| `/e/:publicId` | 参加者ページ（共有URL） |
+| `/manage/:adminToken` | 主催者ページ（作成直後に表示。ブックマーク推奨） |
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 技術構成
+
+Next.js 16 (App Router) / React 19 / TypeScript / Tailwind CSS v4 / Drizzle ORM / PostgreSQL（開発時は PGlite）
