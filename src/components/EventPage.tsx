@@ -228,7 +228,7 @@ function NameEntry({ onJoin }: { onJoin: (name: string) => Promise<void> }) {
         あなたの名前
       </label>
       <p className="mt-0.5 text-xs text-muted">
-        登録は不要です。みんなに分かる名前で
+        みんなに分かる名前で
       </p>
       <div className="mt-3 flex gap-2">
         <input
