@@ -32,7 +32,7 @@ http://localhost:3000 を開く。`DATABASE_URL` が未設定のときは PGlite
 | `npm run build` / `npm start` | 本番ビルド / 起動 |
 | `npm run lint` | ESLint |
 | `npm run db:generate` | スキーマ変更から SQL マイグレーションを生成（`drizzle/`） |
-| `npm run db:migrate` | `DATABASE_URL` の DB にマイグレーションを適用 |
+| `npm run db:migrate` | `DATABASE_URL` の DB にマイグレーションを適用（Vercel ではビルド時に自動実行） |
 
 ## URL
 

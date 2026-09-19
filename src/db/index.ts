@@ -9,7 +9,7 @@ export type Db = PgDatabase<PgQueryResultHKT, typeof schema>;
 const globalForDb = globalThis as unknown as { __aiteruDb?: Promise<Db> };
 
 async function createDb(): Promise<Db> {
-  const url = process.env.DATABASE_URL;
+  const url = process.env.DATABASE_URL ?? process.env.POSTGRES_URL;
   if (url) {
     const { drizzle } = await import("drizzle-orm/node-postgres");
     const { Pool } = await import("pg");
