@@ -227,9 +227,7 @@ function NameEntry({ onJoin }: { onJoin: (name: string) => Promise<void> }) {
       <label htmlFor="name" className="block text-sm font-semibold">
         あなたの名前
       </label>
-      <p className="mt-0.5 text-xs text-muted">
-        みんなに分かる名前で
-      </p>
+      <p className="mt-0.5 text-xs text-muted">みんなに分かる名前で</p>
       <div className="mt-3 flex gap-2">
         <input
           id="name"

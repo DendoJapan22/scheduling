@@ -9,8 +9,9 @@ import {
   type PointerEvent as ReactPointerEvent,
 } from "react";
 import type { EventPublic } from "@/lib/event-types";
-import { dateRange, slotKey, slotStarts } from "@/lib/time";
+import { slotKey } from "@/lib/time";
 import { GridFrame } from "./GridFrame";
+import { eventDays, gridRows, validSlotKeys } from "@/lib/days";
 
 type Cell = { c: number; r: number };
 type Drag = { anchor: Cell; current: Cell; mode: "add" | "remove" };
@@ -30,15 +31,13 @@ type Props = {
  * - タッチでは「少し押してからなぞる」と選択、すぐ動かすとスクロール（ジェスチャーの衝突回避）
  */
 export function AvailabilityGrid({ event, value, onChange }: Props) {
-  const dates = useMemo(
-    () => dateRange(event.startDate, event.endDate),
-    [event.startDate, event.endDate],
-  );
+  const days = useMemo(() => eventDays(event), [event]);
+  const dates = useMemo(() => days.map((d) => d.date), [days]);
   const starts = useMemo(
-    () => slotStarts(event.dailyStart, event.dailyEnd, event.slotMinutes),
-    [event.dailyStart, event.dailyEnd, event.slotMinutes],
+    () => gridRows(days, event.slotMinutes),
+    [days, event.slotMinutes],
   );
-
+  const valid = useMemo(() => validSlotKeys(event), [event]);
   const scrollRef = useRef<HTMLDivElement>(null);
   const [drag, setDrag] = useState<Drag | null>(null);
   const dragRef = useRef<Drag | null>(null);
@@ -83,13 +82,14 @@ export function AvailabilityGrid({ event, value, onChange }: Props) {
       for (let c = c0; c <= c1; c++) {
         for (let r = r0; r <= r1; r++) {
           const k = slotKey(dates[c], starts[r]);
+          if (!valid.has(k)) continue;
           if (d.mode === "add") next.add(k);
           else next.delete(k);
         }
       }
       onChange(next);
     },
-    [dates, starts, value, onChange],
+    [dates, starts, valid, value, onChange],
   );
 
   const startDrag = useCallback(
@@ -204,7 +204,18 @@ export function AvailabilityGrid({ event, value, onChange }: Props) {
       onPointerUp={onPointerUp}
       onPointerCancel={onPointerCancel}
       renderCell={(date, s, ci, ri) => {
-        const on = value.has(slotKey(date, s));
+        const k = slotKey(date, s);
+        if (!valid.has(k)) {
+          return (
+            <div
+              key={`${date}${s}`}
+              className="cell cell-off grid-cells"
+              data-half={event.slotMinutes < 60 && s % 60 !== 0}
+              aria-hidden
+            />
+          );
+        }
+        const on = value.has(k);
         let preview: "add" | "remove" | undefined;
         if (drag && inRect(ci, ri, drag)) {
           if (drag.mode === "add" && !on) preview = "add";

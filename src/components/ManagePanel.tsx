@@ -55,6 +55,8 @@ export function ManagePanel({
     dailyEnd: String(event.dailyEnd),
     slotMinutes: String(event.slotMinutes),
     desiredMinutes: String(event.desiredMinutes),
+    mode: event.days ? "dates" : "range",
+    days: event.days ? JSON.stringify(event.days) : "",
   };
 
   return (
@@ -108,7 +110,11 @@ export function ManagePanel({
           action={action}
           className="card fade-in mt-4 flex flex-col gap-6 p-5"
         >
-          <EventFields values={values} errors={state.errors} />
+          <EventFields
+            key={state.attempt ?? 0}
+            values={values}
+            errors={state.errors}
+          />
           <p className="text-xs text-muted">
             期間や時間帯を狭めると、その範囲外の回答は集計に表示されなくなります。
           </p>

@@ -3,15 +3,9 @@
 import { useMemo, useState } from "react";
 import type { EventPublic, ParticipantPublic } from "@/lib/event-types";
 import { countBySlot } from "@/lib/scoring";
-import {
-  dateRange,
-  formatDateJa,
-  formatMin,
-  parseSlotKey,
-  slotKey,
-  slotStarts,
-} from "@/lib/time";
+import { formatDateJa, formatMin, parseSlotKey, slotKey } from "@/lib/time";
 import { GridFrame } from "./GridFrame";
+import { eventDays, gridRows, validSlotKeys } from "@/lib/days";
 
 type Props = {
   event: EventPublic;
@@ -25,14 +19,13 @@ export function HeatmapGrid({
   participants,
   focusParticipantId,
 }: Props) {
-  const dates = useMemo(
-    () => dateRange(event.startDate, event.endDate),
-    [event.startDate, event.endDate],
-  );
+  const days = useMemo(() => eventDays(event), [event]);
+  const dates = useMemo(() => days.map((d) => d.date), [days]);
   const starts = useMemo(
-    () => slotStarts(event.dailyStart, event.dailyEnd, event.slotMinutes),
-    [event.dailyStart, event.dailyEnd, event.slotMinutes],
+    () => gridRows(days, event.slotMinutes),
+    [days, event.slotMinutes],
   );
+  const valid = useMemo(() => validSlotKeys(event), [event]);
   const bySlot = useMemo(() => countBySlot(participants), [participants]);
   const nameOf = useMemo(
     () => new Map(participants.map((p) => [p.id, p.name])),
@@ -56,6 +49,16 @@ export function HeatmapGrid({
         slotMinutes={event.slotMinutes}
         renderCell={(date, s) => {
           const k = slotKey(date, s);
+          if (!valid.has(k)) {
+            return (
+              <div
+                key={`${date}${s}`}
+                className="cell cell-off"
+                data-half={event.slotMinutes < 60 && s % 60 !== 0}
+                aria-hidden
+              />
+            );
+          }
           const n = focus
             ? focusSet.has(k)
               ? 1

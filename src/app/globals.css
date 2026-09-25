@@ -142,6 +142,7 @@ select.field {
   padding: 0 14px;
   border-radius: 9px;
   font-weight: 600;
+  white-space: nowrap;
   color: var(--muted);
   transition: background-color 0.15s, color 0.15s;
   -webkit-tap-highlight-color: transparent;
@@ -192,6 +193,16 @@ select.field {
   .cell-avail[data-on="false"]:hover {
     background: var(--accent-soft);
   }
+}
+/* その日の受付時間外 */
+.cell-off {
+  background: repeating-linear-gradient(
+    -45deg,
+    #f3f1ec,
+    #f3f1ec 4px,
+    #ebe8e1 4px,
+    #ebe8e1 8px
+  );
 }
 .sticky-top {
   position: sticky;

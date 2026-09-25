@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { describeSchedule } from "@/components/EventHeader";
 import { EventPage } from "@/components/EventPage";
 import { findEventByPublicId, loadResults, toPublic } from "@/lib/queries";
-import { formatDateJa, formatMin } from "@/lib/time";
 
 export const dynamic = "force-dynamic";
 
@@ -14,7 +14,7 @@ export async function generateMetadata(
   if (!event) return { title: "イベントが見つかりません" };
   return {
     title: event.title,
-    description: `${formatDateJa(event.startDate)}〜${formatDateJa(event.endDate)} ${formatMin(event.dailyStart)}〜${formatMin(event.dailyEnd)} の空いている時間を教えてください`,
+    description: `${describeSchedule(toPublic(event))} の空いている時間を教えてください`,
     robots: { index: false },
   };
 }

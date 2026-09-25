@@ -1,3 +1,5 @@
+import type { DayWindow } from "./days";
+
 export type EventPublic = {
   publicId: string;
   title: string;
@@ -7,6 +9,7 @@ export type EventPublic = {
   dailyEnd: number;
   slotMinutes: number;
   desiredMinutes: number;
+  days: DayWindow[] | null;
 };
 
 export type ParticipantPublic = {

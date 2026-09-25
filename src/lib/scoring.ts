@@ -1,5 +1,6 @@
 import type { EventPublic, ParticipantPublic } from "./event-types";
-import { dateRange, slotKey, slotStarts } from "./time";
+import { daySlotStarts, eventDays } from "./days";
+import { slotKey } from "./time";
 
 export type BestTime = {
   date: string;
@@ -23,22 +24,19 @@ export function findBestTimes(
   const total = participants.length;
   if (total === 0) return [];
 
-  const starts = slotStarts(
-    event.dailyStart,
-    event.dailyEnd,
-    event.slotMinutes,
-  );
-  const windowLen = Math.max(
+  const wanted = Math.max(
     1,
-    Math.min(
-      starts.length,
-      Math.round(event.desiredMinutes / event.slotMinutes),
-    ),
+    Math.round(event.desiredMinutes / event.slotMinutes),
   );
   const sets = participants.map((p) => new Set(p.slotKeys));
 
   const candidates: BestTime[] = [];
-  for (const date of dateRange(event.startDate, event.endDate)) {
+  for (const day of eventDays(event)) {
+    const date = day.date;
+    const starts = daySlotStarts(day, event.slotMinutes);
+    // 予定の長さより短い枠しかない日は、その日の枠全体で評価する
+    const windowLen = Math.min(starts.length, wanted);
+    if (windowLen === 0) continue;
     let prev: BestTime | null = null;
     for (let i = 0; i + windowLen <= starts.length; i++) {
       const ids: string[] = [];
@@ -89,7 +87,10 @@ export function findBestTimes(
   const chosen: BestTime[] = [];
   for (const c of candidates) {
     if (chosen.length >= limit) break;
-    const overlaps = chosen.some((x) => x.date === c.date && x.startMin < c.endMin && c.startMin < x.endMin);
+    const overlaps = chosen.some(
+      (x) =>
+        x.date === c.date && x.startMin < c.endMin && c.startMin < x.endMin,
+    );
     if (!overlaps) chosen.push(c);
   }
   return chosen;

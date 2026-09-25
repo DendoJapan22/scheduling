@@ -42,6 +42,7 @@ events
   daily_end     int
   slot_minutes  int  (30 | 60)
   desired_minutes int (予定の長さ。ランキング用)
+  days          jsonb NULL  (日にち指定モードのみ。[{date, start, end}])
   created_at / updated_at
 
 participants
@@ -61,6 +62,10 @@ availability_slots
   UNIQUE(participant_id, date, start_min)
 ```
 
+- 日程の決め方は2通り。「期間で指定」は start_date〜end_date の毎日同じ時間帯。
+  「日にち指定」は days に日ごとの時間帯を持ち、start_date 等には最小〜最大を入れる。
+  アプリ内では `src/lib/days.ts` の eventDays() で両方を「日ごとの時間帯の配列」に揃えて扱う。
+  グリッドの行は全日の時間帯を合わせた範囲で、その日の時間外のセルは斜線で無効表示。
 - 時刻はタイムゾーン変換を避けるため「日付文字列 + 0:00からの分」で保持する。
 - 保存は「参加者の全スロットを置き換える」1トランザクション。行数は最大でも 31日×48枠。
 - 主催者が期間・時間帯を変更した場合、グリッド外の回答は表示から除外される（削除はしない）。

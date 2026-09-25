@@ -1,7 +1,9 @@
+import type { DayWindow } from "@/lib/days";
 import {
   date,
   index,
   integer,
+  jsonb,
   pgTable,
   text,
   timestamp,
@@ -22,6 +24,8 @@ export const events = pgTable(
     dailyEnd: integer("daily_end").notNull(),
     slotMinutes: integer("slot_minutes").notNull(),
     desiredMinutes: integer("desired_minutes").notNull(),
+    /** 日にち指定モードのときだけ入る。null なら期間モード */
+    days: jsonb("days").$type<DayWindow[] | null>(),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
       .defaultNow(),

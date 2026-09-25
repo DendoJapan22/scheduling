@@ -18,7 +18,11 @@ export function CreateEventForm() {
 
   return (
     <form action={action} className="card flex flex-col gap-6 p-5 sm:p-6">
-      <EventFields values={values} errors={state.errors} />
+      <EventFields
+        key={state.attempt ?? 0}
+        values={values}
+        errors={state.errors}
+      />
       {state.errors?._ && (
         <p className="text-sm text-danger">{state.errors._}</p>
       )}

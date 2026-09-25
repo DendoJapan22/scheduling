@@ -2,7 +2,7 @@ import { and, eq } from "drizzle-orm";
 import { getDb } from "@/db";
 import { availabilitySlots, events, participants } from "@/db/schema";
 import { error, json, readJson } from "@/lib/api";
-import { validSlotKeys } from "@/lib/queries";
+import { validSlotKeys } from "@/lib/days";
 import { clientIp, rateLimit } from "@/lib/ratelimit";
 import { parseSlotKey } from "@/lib/time";
 import { nameSchema, slotsSchema } from "@/lib/validation";

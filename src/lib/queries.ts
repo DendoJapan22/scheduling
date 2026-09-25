@@ -8,7 +8,8 @@ import {
   type EventRow,
 } from "@/db/schema";
 import type { EventPublic, Results } from "./event-types";
-import { dateRange, slotKey, slotStarts } from "./time";
+import { validSlotKeys } from "./days";
+import { slotKey } from "./time";
 
 export function toPublic(e: EventRow): EventPublic {
   return {
@@ -20,6 +21,7 @@ export function toPublic(e: EventRow): EventPublic {
     dailyEnd: e.dailyEnd,
     slotMinutes: e.slotMinutes,
     desiredMinutes: e.desiredMinutes,
+    days: e.days ?? null,
   };
 }
 
@@ -89,21 +91,4 @@ export async function loadResults(event: EventRow): Promise<Results> {
       slotKeys: byParticipant.get(p.id) ?? [],
     })),
   };
-}
-
-export function validSlotKeys(
-  event: Pick<
-    EventRow,
-    "startDate" | "endDate" | "dailyStart" | "dailyEnd" | "slotMinutes"
-  >,
-): Set<string> {
-  const set = new Set<string>();
-  const starts = slotStarts(
-    event.dailyStart,
-    event.dailyEnd,
-    event.slotMinutes,
-  );
-  for (const d of dateRange(event.startDate, event.endDate))
-    for (const s of starts) set.add(slotKey(d, s));
-  return set;
 }
